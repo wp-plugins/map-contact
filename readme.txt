@@ -30,7 +30,7 @@ Map Contact is a easy to use map plugin which allows you to create a contact us 
 into html code.
 
 
-* If you have any suggestions what so ever please don’t hesitate to leave feedback.
+* If you have any suggestions what so ever please dont hesitate to leave feedback.
 
 
 = Localization =
