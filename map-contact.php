@@ -5,7 +5,7 @@
 	Author: Ryan Smith
     Plugin URI: http://xantoo.com/
     Author URI: http://xantoo.com/
-	Version: 2 BETA
+	Version: 2.0
  */
 
 include(plugin_dir_path( __FILE__ )."includes/maps.php");
