@@ -54,5 +54,8 @@ into html code.
 
 = 
 
+= 2.0.1 - 02/08/2014 =
+*  Minor bug fixes
+
 = 2.0 - 01/08/2014 =
 *  Initial release
