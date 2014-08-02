@@ -3,9 +3,9 @@
 	Plugin Name: Map Contact
 	Description: Instantly create stylish and professional Contact Us Page with Map for any WordPress Theme!
 	Author: Ryan Smith
-    Plugin URI: http://xantoo.com/
+    Plugin URI: http://wordpress.org/plugins/map-contact/
     Author URI: http://xantoo.com/
-	Version: 2.0
+	Version: 2.0.1
  */
 
 include(plugin_dir_path( __FILE__ )."includes/maps.php");
@@ -24,7 +24,7 @@ function shortcodeManagment($attributes){
         mail($to, $subject, $message, $headers);
     }
 
-    $code = "<style>a{} #map-contact h2 {margin-bottom:5px;} #map-contact h2,#map-contact div{font-family:Arial,Helvetica,sans-serif;}</style>";
+    $code = "<style>#map-contact h2 {margin-bottom:5px;} #map-contact h2,#map-contact div{font-family:Arial,Helvetica,sans-serif;}</style>";
     if ($attributes["map"]=="true" || !isset($attributes["map"]))
     {
         $options = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."map_settings");
@@ -97,7 +97,7 @@ function shortcodeManagment($attributes){
                                 </div>
                              </div>';
             }
-            $code .= "<div style='position:relative; float: left; margin-bottom:25px; margin-right:10px; min-height:100px; min-width:200px; max-width:250px; padding-left:20px;' id='".$count."_person' class='person_entry'>".$img.$address["infoWindow"].$contact."</div>";
+            $code .= "<div style='position:relative; float: left; margin-bottom:25px; margin-right:10px; min-height:100px; min-width:200px; max-width:250px; padding-left:20px;' id='".$address["id"]."_person' class='person_entry'>".$address["infoWindow"].$contact."</div>";
         }
         $code .= "</div>";
     }
@@ -162,7 +162,7 @@ function pluginActivated() {
 
     if (!$wpdb->get_var( "SELECT * FROM ".$wpdb->prefix."map_addresses" ))
     {
-        $query = dbDelta( "CREATE TABLE ".$wpdb->prefix."map_addresses (
+        dbDelta( "CREATE TABLE ".$wpdb->prefix."map_addresses (
         `id` int(11) NOT NULL AUTO_INCREMENT,
         `name` text NOT NULL,
         `infoWindow` text NOT NULL,

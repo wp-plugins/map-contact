@@ -48,7 +48,7 @@ into html code.
 == Screenshots ==
 
 1. Contact Maps with Maps and Address Book enabled without pictures.
-
+2. Contact Maps with Maps and Address Book enabled with pictures.
 
 == Changelog ==
 
