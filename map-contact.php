@@ -5,24 +5,13 @@
 	Author: Ryan Smith
     Plugin URI: http://wordpress.org/plugins/map-contact/
     Author URI: http://xantoo.com/
-	Version: 2.0.1
+	Version: 2.0.2
  */
 
 include(plugin_dir_path( __FILE__ )."includes/maps.php");
 
 function shortcodeManagment($attributes){
     global $wpdb;
-
-    if (isset($_POST["send_email"]) && isset($_POST["eto"]) && isset($_POST["emessage"]))
-    {
-
-        $to      = $_POST["eto"];
-        $subject = $_POST["esubject"]." - Map Contact";
-        $message = $_POST["emessage"];
-        $headers = 'From: '.$_POST["email"] . "\r\n";
-
-        mail($to, $subject, $message, $headers);
-    }
 
     $code = "<style>#map-contact h2 {margin-bottom:5px;} #map-contact h2,#map-contact div{font-family:Arial,Helvetica,sans-serif;}</style>";
     if ($attributes["map"]=="true" || !isset($attributes["map"]))
@@ -79,16 +68,18 @@ function shortcodeManagment($attributes){
             $address = get_object_vars($address);
             if (!empty($address["email"])){
                 $contact = '<button type="button" onclick="document.getElementById(\''.$address["id"].'_lightbox\').style.display=\'inline\';" >Contact by email</button>';
+                if (strpos($_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"],"http")!==true) { $URL = "http://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"]; } else { $URL = $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"]; }
 
-                $form = "<form method='POST'>
+                $form = "<form action='".get_admin_url()."admin-post.php?action=email&return=".base64_encode($URL)."' method='POST'>
                             <table style='padding-top:10px;'>
-                            <input type='hidden' name='eto' value='".$address["email"]."'>
-                            <tr><td style='width:200px; border:0;'>Name:</td><td style='width:300px; border:0;'><input style='width:100%;' type='text' name='ename'></td></tr>
-                            <tr><td style='width:200px; border:0;'>Subject:</td><td style='width:300px; border:0;'><input style='width:100%;' type='text' name='esubject'></td></tr>
+                            <input type='hidden' name='to' value='".$address["id"]."'>
+                            <tr><td style='width:200px; border:0;'>Name:</td><td style='width:300px; border:0;'><input style='width:100%;' type='text' name='name'></td></tr>
+                            <tr><td style='width:200px; border:0;'>Subject:</td><td style='width:300px; border:0;'><input style='width:100%;' type='text' name='subject'></td></tr>
                             <tr><td style='width:200px; border:0;'>Email:</td><td style='width:300px; border:0;'><input style='width:100%;' type='text' name='email'></td></tr>
-                            <tr><td style='width:200px; border:0;'>Message</td><td style='max-width:300px; border:0;'><textarea style='max-width:100%; width:100%; max-height:106px;height: 106px;' name='emessage'></textarea></td></tr>
+                            <tr><td style='width:200px; border:0;'>Message</td><td style='max-width:300px; border:0;'><textarea style='max-width:100%; width:100%; max-height:106px;height: 106px;' name='message'></textarea></td></tr>
                             <tr><td style='width:200px; border:0;'></td><td style='width:300px; border:0;'><input style='float:right;' type='submit' name='send_email' value='Send Email'></td></tr>
-                            </table>";
+                            </table></form>";
+
                 $code .= '<div id="'.$address["id"].'_lightbox" style="z-index:99999; display:none;"class="lightbox">
                                 <div id="'.$address["id"].'_contact" style="position: relative; width:530px; background:#fff; top: 25%; padding-right:10px; padding-left:15px; padding-bottom:10px;padding-top:10px; border-radius:5px; margin:0 auto;">
                                     <img style="position:relative; float:right; padding-right:6px; padding-top:6px; cursor: pointer;" onclick="document.getElementById(\''.$address["id"].'_lightbox\').style.display=\'none\';" src="'.plugins_url( 'map-contact/images/close.png', dirname(__FILE__)).'">
@@ -124,6 +115,28 @@ function addressBook()
 function newAddress()
 {
     include(plugin_dir_path( __FILE__ )."admin/add_new_address.php");
+}
+
+function sendEmailContact()
+{
+    global $wpdb;
+
+    if (isset($_POST["send_email"]) && isset($_POST["to"]) && isset($_POST["message"]))
+    {
+        $returnEm = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."map_addresses WHERE id='".$_POST["to"]."'");
+        $returnEm = get_object_vars($returnEm[0]);
+
+        $to      = $returnEm["email"];
+        $subject = $_POST["subject"]." - Map Contact";
+        $message = $_POST["message"];
+        $headers = 'From: '.$_POST["email"] . "\r\n";
+
+        mail($to, $subject, $message, $headers);
+
+        echo "Sending Email...";
+        sleep(2);
+        echo '<meta http-equiv="refresh" content="0; url='.base64_decode($_GET["return"]).'">';
+    }
 }
 
 function pluginActivated() {
@@ -184,6 +197,7 @@ function pluginActivated() {
     }
 }
 
+add_action("admin_post_email","sendEmailContact");
 add_action( 'admin_menu', "addSettingsPages" );
 add_shortcode( 'map-contact', 'shortcodeManagment' );
 register_activation_hook( __FILE__, "pluginActivated");

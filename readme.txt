@@ -54,6 +54,10 @@ into html code.
 
 = 
 
+= 2.0.2 - 02/08/2014 =
+*  Email bug fixes
+*  More secure email handling
+
 = 2.0.1 - 02/08/2014 =
 *  Minor bug fixes
 
