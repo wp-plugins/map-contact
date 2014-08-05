@@ -40,7 +40,13 @@ into html code.
 == Installation ==
  
 * Activate Plugin
+* Go to post/page editor switch from visual to text
+* Click the button "Map Contact Shortcode"
+
+or 
+* Activate Plugin
 * Copy and paste [map-contact map="true" addressbook="true" width="500px" height="500px"] on the page you wish to have the map and address book to display on.
+
 
 * If you want the map to be responsive change the 500px to 100%
 * If you only want the map and not the contact boxes then change addressbook to false.
@@ -53,6 +59,9 @@ into html code.
 == Changelog ==
 
 = 
+
+= 2.0.3 - 05/08/2014 =
+*  Button added to editor for easier shortcode adding!
 
 = 2.0.2 - 02/08/2014 =
 *  Email bug fixes

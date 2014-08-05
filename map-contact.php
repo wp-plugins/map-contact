@@ -5,7 +5,7 @@
 	Author: Ryan Smith
     Plugin URI: http://wordpress.org/plugins/map-contact/
     Author URI: http://xantoo.com/
-	Version: 2.0.2
+	Version: 2.0.3
  */
 
 include(plugin_dir_path( __FILE__ )."includes/maps.php");
@@ -81,12 +81,12 @@ function shortcodeManagment($attributes){
                             </table></form>";
 
                 $code .= '<div id="'.$address["id"].'_lightbox" style="z-index:99999; display:none;"class="lightbox">
-                                <div id="'.$address["id"].'_contact" style="position: relative; width:530px; background:#fff; top: 25%; padding-right:10px; padding-left:15px; padding-bottom:10px;padding-top:10px; border-radius:5px; margin:0 auto;">
-                                    <img style="position:relative; float:right; padding-right:6px; padding-top:6px; cursor: pointer;" onclick="document.getElementById(\''.$address["id"].'_lightbox\').style.display=\'none\';" src="'.plugins_url( 'map-contact/images/close.png', dirname(__FILE__)).'">
-                                    <h2>'.$address["name"].'</h2>
-                                    '.$form.'
-                                </div>
-                             </div>';
+                            <div id="'.$address["id"].'_contact" style="position: relative; width:530px; background:#fff; top: 25%; padding-right:10px; padding-left:15px; padding-bottom:10px;padding-top:10px; border-radius:5px; margin:0 auto;">
+                                <img style="position:relative; float:right; padding-right:6px; padding-top:6px; cursor: pointer;" onclick="document.getElementById(\''.$address["id"].'_lightbox\').style.display=\'none\';" src="'.plugins_url( 'map-contact/images/close.png', dirname(__FILE__)).'">
+                                <h2>'.$address["name"].'</h2>
+                                '.$form.'
+                            </div>
+                          </div>';
             }
             $code .= "<div style='position:relative; float: left; margin-bottom:25px; margin-right:10px; min-height:100px; min-width:200px; max-width:250px; padding-left:20px;' id='".$address["id"]."_person' class='person_entry'>".$address["infoWindow"].$contact."</div>";
         }
@@ -136,6 +136,15 @@ function sendEmailContact()
         echo "Sending Email...";
         sleep(2);
         echo '<meta http-equiv="refresh" content="0; url='.base64_decode($_GET["return"]).'">';
+    }
+}
+
+function editorButtons()
+{
+    if (wp_script_is('quicktags')){
+        echo "<script type=\"text/javascript\">
+            QTags.addButton( 'mc_shortcode', 'Map Contact Shortcode', '[map-contact map=\"true\" addressbook=\"true\"width=\"500px\" height=\"500px\"]', '', 'mc_shortcode', 'Map Contact Shortcode',  999);
+        </script>";
     }
 }
 
@@ -198,6 +207,7 @@ function pluginActivated() {
 }
 
 add_action("admin_post_email","sendEmailContact");
+add_action( 'admin_print_footer_scripts', 'editorButtons' );
 add_action( 'admin_menu', "addSettingsPages" );
 add_shortcode( 'map-contact', 'shortcodeManagment' );
 register_activation_hook( __FILE__, "pluginActivated");
