@@ -5,7 +5,7 @@
 	Author: Ryan Smith
     Plugin URI: http://wordpress.org/plugins/map-contact/
     Author URI: http://xantoo.com/
-	Version: 2.0.3
+	Version: 2.0.4
  */
 
 include(plugin_dir_path( __FILE__ )."includes/maps.php");
@@ -143,7 +143,7 @@ function editorButtons()
 {
     if (wp_script_is('quicktags')){
         echo "<script type=\"text/javascript\">
-            QTags.addButton( 'mc_shortcode', 'Map Contact Shortcode', '[map-contact map=\"true\" addressbook=\"true\"width=\"500px\" height=\"500px\"]', '', 'mc_shortcode', 'Map Contact Shortcode',  999);
+            QTags.addButton( 'mc_shortcode', 'Map Contact Shortcode', '[map-contact map=\"true\" addressbook=\"true\" width=\"500px\" height=\"500px\"]', '', 'mc_shortcode', 'Map Contact Shortcode',  999);
         </script>";
     }
 }

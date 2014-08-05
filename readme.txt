@@ -60,6 +60,9 @@ or
 
 = 
 
+= 2.0.4 - 05/08/2014 =
+*  Bug Fixes
+
 = 2.0.3 - 05/08/2014 =
 *  Button added to editor for easier shortcode adding!
 
