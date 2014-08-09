@@ -93,6 +93,7 @@ echo '<link rel="stylesheet" type="text/css" href="'.plugins_url( 'includes/styl
         $imported = false;
         foreach ($addressess as $address)
         {
+            $image = "";
             $address = get_object_vars($address);
 
             if (!empty($address["image"]) && $imported==false)
@@ -106,8 +107,9 @@ echo '<link rel="stylesheet" type="text/css" href="'.plugins_url( 'includes/styl
                 $imported = true;
             }
 
-            $image = "<div style='width:100%; text-align:center;'><img src='".$address["image"]."' style='max-width:100%;' /></div>"."<div style='text-align:center;'><input type='hidden'  name='".$address["id"]."_image' value='' style='width:63.01%;' /><input type='button' class='upload-button' value='Change Image' /></div>";
+            if (!empty($address["image"])) { $image = "<div style='width:100%; text-align:center;'><img src='".$address["image"]."' style='max-width:100%;' /></div>";}
 
+            $image .= "<div style='text-align:center; width:100%;'><input type='hidden'  name='".$address["id"]."_image' value='' /><input type='button' style='width:100%;' class='upload-button' value='Change' /></div>";
             $listTable->data[] = array("id" => $address["id"],"image" => $image,"name" => "<input name='".$address["id"]."_"."name"."' type='text' style='width:100%;' value='".$address["name"]."'>","infowindow" => "<textarea name='".$address["id"]."_"."infowindow"."' style='max-width: 100%; max-height: 106px;width:100%; height:106px;'>".$address["infoWindow"]."</textarea>","address" => "<input name='".$address["id"]."_"."address"."' type='text' style='width:100%;' value='".$address["address"]."'>","email" => "<input name='".$address["id"]."_"."email"."' type='text' style='width:100%;' value='".$address["email"]."'>", "delete" => "<div style='height:106px; line-height:106px; text-align:center;'><form id='delete' action='".$URL."' method='POST'><input type='submit' value='Delete' name='".$address['id']."_delete'></form></div>");
         }
 
