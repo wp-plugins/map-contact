@@ -22,13 +22,10 @@ Map Contact is a easy to use map plugin which allows you to create a contact us 
 * Fully mobile responsive using JQuery masonry.
 * Fully cross browser compliant including IE7 to IE11.
 * Mobile device optimized, all tablets and phones.
-* Click on map markets to open the persons profile as well as displaying the persons profile under the map.
+* Click on map markers to open the persons profile as well as displaying the persons profile under the map.
+* Upload and change contact images in seconds.
 
 = To-Do =
-
-* Profile Pictures upload via admin, currently only available by uploading picture manually and pasting link
-into html code.
-
 
 * If you have any suggestions what so ever please dont hesitate to leave feedback.
 
@@ -59,6 +56,9 @@ or
 == Changelog ==
 
 = 
+
+= 3.0 - 09/08/2014 =
+*  Upload and change contact images, without having to put code!
 
 = 2.0.4 - 05/08/2014 =
 *  Bug Fixes

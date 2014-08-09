@@ -6,6 +6,7 @@ class listTable extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'id' => 'ID',
+            'image'    => 'Image',
             'name'    => 'Name',
             'address'      => 'Address',
             'infowindow'      => 'Info Window HTML',
@@ -55,7 +56,7 @@ echo '<link rel="stylesheet" type="text/css" href="'.plugins_url( 'includes/styl
                 $id = explode("_",$key)[0];
                 $row = $wpdb->get_var("SELECT $element FROM ".$wpdb->prefix."map_settings WHERE id='".$id."'");
 
-                if (@mysql_fetch_array($result) !== false && !empty($id) && !empty($element))
+                if (@mysql_fetch_array($result) !== false && !empty($id) && !empty($element) && !empty($value))
                 {
                     $wpdb->query("UPDATE ".$wpdb->prefix."map_addresses SET $element='".$value."' WHERE id='".$id."'");
                 }
@@ -89,10 +90,25 @@ echo '<link rel="stylesheet" type="text/css" href="'.plugins_url( 'includes/styl
         }
 
         $addressess = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."map_addresses");
+        $imported = false;
         foreach ($addressess as $address)
         {
             $address = get_object_vars($address);
-            $listTable->data[] = array("id" => $address["id"],"name" => "<input name='".$address["id"]."_"."name"."' type='text' style='width:100%;' value='".$address["name"]."'>","infowindow" => "<textarea name='".$address["id"]."_"."infowindow"."' style='max-width: 100%; max-height: 106px;width:100%; height:106px;'>".$address["infoWindow"]."</textarea>","address" => "<input name='".$address["id"]."_"."address"."' type='text' style='width:100%;' value='".$address["address"]."'>","email" => "<input name='".$address["id"]."_"."email"."' type='text' style='width:100%;' value='".$address["email"]."'>", "delete" => "<div style='height:106px; line-height:106px; text-align:center;'><form id='delete' action='".$URL."' method='POST'><input type='submit' value='Delete' name='".$address['id']."_delete'></form></div>");
+
+            if (!empty($address["image"]) && $imported==false)
+            {
+                wp_enqueue_script('jquery');
+                wp_enqueue_script('media-upload');
+                wp_enqueue_script('thickbox');
+                wp_register_script('my-upload', plugin_dir_url(__FILE__).'media_uploader.js', array('jquery','media-upload','thickbox'));
+                wp_enqueue_script('my-upload');
+                wp_enqueue_style('thickbox');
+                $imported = true;
+            }
+
+            $image = "<div style='width:100%; text-align:center;'><img src='".$address["image"]."' style='max-width:100%;' /></div>"."<div style='text-align:center;'><input type='hidden'  name='".$address["id"]."_image' value='' style='width:63.01%;' /><input type='button' class='upload-button' value='Change Image' /></div>";
+
+            $listTable->data[] = array("id" => $address["id"],"image" => $image,"name" => "<input name='".$address["id"]."_"."name"."' type='text' style='width:100%;' value='".$address["name"]."'>","infowindow" => "<textarea name='".$address["id"]."_"."infowindow"."' style='max-width: 100%; max-height: 106px;width:100%; height:106px;'>".$address["infoWindow"]."</textarea>","address" => "<input name='".$address["id"]."_"."address"."' type='text' style='width:100%;' value='".$address["address"]."'>","email" => "<input name='".$address["id"]."_"."email"."' type='text' style='width:100%;' value='".$address["email"]."'>", "delete" => "<div style='height:106px; line-height:106px; text-align:center;'><form id='delete' action='".$URL."' method='POST'><input type='submit' value='Delete' name='".$address['id']."_delete'></form></div>");
         }
 
         $listTable->prepare_items();

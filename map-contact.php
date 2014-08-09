@@ -5,7 +5,7 @@
 	Author: Ryan Smith
     Plugin URI: http://wordpress.org/plugins/map-contact/
     Author URI: http://xantoo.com/
-	Version: 2.0.4
+	Version: 3.0
  */
 
 include(plugin_dir_path( __FILE__ )."includes/maps.php");
@@ -47,7 +47,8 @@ function shortcodeManagment($attributes){
                 $pins[] = array("lat" => $loc["lat"],"lng" => $loc["lng"]);
 
                 $address["infoWindow"] = trim(preg_replace('/\s\s+/', ' ', $address["infoWindow"]));
-                $map->addLocationPin($loc["lat"],$loc["lng"],$address["name"],"<div style='max-width:250px; padding-bottom:10px;'>".preg_replace("/<img[^>]+\>/i", "", $address["infoWindow"])."</div>");
+                $iw = preg_replace("/<img[^>]+\>/i", "", $address["infoWindow"]);
+                $map->addLocationPin($loc["lat"],$loc["lng"],$address["name"],"<div style='max-width:250px; padding-bottom:10px;'>".$iw."</div>");
             }
         }
 
@@ -66,8 +67,12 @@ function shortcodeManagment($attributes){
 
         foreach ($addresses as $address) {
             $address = get_object_vars($address);
+            $contact = "";
+            if (!empty($address["image"])) { $address["infoWindow"] = preg_replace("/".preg_quote("[IMAGE_URL]")."/i",$address["image"],$address["infoWindow"]); }
+
             if (!empty($address["email"])){
                 $contact = '<button type="button" onclick="document.getElementById(\''.$address["id"].'_lightbox\').style.display=\'inline\';" >Contact by email</button>';
+
                 if (strpos($_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"],"http")!==true) { $URL = "http://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"]; } else { $URL = $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"]; }
 
                 $form = "<form action='".get_admin_url()."admin-post.php?action=email&return=".base64_encode($URL)."' method='POST'>
@@ -186,6 +191,7 @@ function pluginActivated() {
     {
         dbDelta( "CREATE TABLE ".$wpdb->prefix."map_addresses (
         `id` int(11) NOT NULL AUTO_INCREMENT,
+        `image` text NOT NULL,
         `name` text NOT NULL,
         `infoWindow` text NOT NULL,
         `email` text NOT NULL,
@@ -200,10 +206,20 @@ function pluginActivated() {
         }
         else
         {
-            $wpdb->get_var("INSERT INTO ".$wpdb->prefix."map_addresses"." VALUES('','Ryan Smith','<h2>Ryan Smith</h2> <img src=\'http://www.w3.org/html/logo/downloads/HTML5_Logo_256.png\' style=\'width: 35% !important; float: left !important; text-align: center; margin-right:14px; background: #FFFFFF !important; border: 1px solid #DBDBDB !important; padding: 2px !important; border-radius: 200px !important; -moz-border-radius: 200px !important; -webkit-border-radius: 200px !important; box-sizing: border-box !important; -moz-box-sizing: border-box !important; -webkit-box-sizing: border-box !important;\'><div>Ryan, our lead developer on Map Contact is located in Greater London!</div>','ryan@xantoo.com','London')");
-            $wpdb->get_var("INSERT INTO ".$wpdb->prefix."map_addresses"." VALUES('','James Smith','<h2>James Smith</h2><img src=\'http://a1.res.cloudinary.com/hvqqwrowv/image/asset/css3-65bdc13faee51df7f05b91f44414a80d.png\' style=\'width: 35% !important; float: left !important; text-align: center; margin-right:14px; background: #FFFFFF !important; border: 1px solid #DBDBDB !important; padding: 2px !important; border-radius: 200px !important; -moz-border-radius: 200px !important; -webkit-border-radius: 200px !important; box-sizing: border-box !important; -moz-box-sizing: border-box !important; -webkit-box-sizing: border-box !important;\'><div>James, our lead marketer on Map Contact is located in Greater London!</div>','james@xantoo.com','London')");
+            $wpdb->get_var("INSERT INTO ".$wpdb->prefix."map_addresses"." VALUES('','http://www.w3.org/html/logo/downloads/HTML5_Logo_256.png','Ryan Smith',\"<h2>Ryan Smith</h2><img src='[IMAGE_URL]'><div>Ryan, our lead developer on Map Contact is located in Greater London!</div>\",'ryan@xantoo.com','London')");
+            $wpdb->get_var("INSERT INTO ".$wpdb->prefix."map_addresses"." VALUES('','http://a1.res.cloudinary.com/hvqqwrowv/image/asset/css3-65bdc13faee51df7f05b91f44414a80d.png','James Smith',\"<h2>James Smith</h2><img src='[IMAGE_URL]'><div>James, our lead marketer on Map Contact is located in Greater London!</div>\",'james@xantoo.com','London')");
         }
     }
+}
+
+function updatePlugin()
+{
+    //2.1 UPDATE
+    global $wpdb;
+
+    $result = $wpdb->get_var("SHOW COLUMNS FROM `wp_map_addresses` LIKE 'image'");
+
+    if (!$result) { $wpdb->query("ALTER TABLE wp_map_addresses ADD COLUMN `image` text NOT NULL AFTER `ID`"); }
 }
 
 add_action("admin_post_email","sendEmailContact");
@@ -211,4 +227,5 @@ add_action( 'admin_print_footer_scripts', 'editorButtons' );
 add_action( 'admin_menu', "addSettingsPages" );
 add_shortcode( 'map-contact', 'shortcodeManagment' );
 register_activation_hook( __FILE__, "pluginActivated");
+add_action( 'admin_init', 'updatePlugin' );
 ?>
