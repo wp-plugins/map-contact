@@ -57,6 +57,9 @@ or
 
 = 
 
+= 3.0.1 - 09/08/2014 =
+*  Minor uploading bug fixes
+
 = 3.0 - 09/08/2014 =
 *  Upload and change contact images, without having to put code!
 

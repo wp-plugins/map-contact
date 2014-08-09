@@ -5,7 +5,7 @@
 	Author: Ryan Smith
     Plugin URI: http://wordpress.org/plugins/map-contact/
     Author URI: http://xantoo.com/
-	Version: 3.0
+	Version: 3.0.1
  */
 
 include(plugin_dir_path( __FILE__ )."includes/maps.php");
@@ -214,7 +214,6 @@ function pluginActivated() {
 
 function updatePlugin()
 {
-    //2.1 UPDATE
     global $wpdb;
 
     $result = $wpdb->get_var("SHOW COLUMNS FROM `wp_map_addresses` LIKE 'image'");
