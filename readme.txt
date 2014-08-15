@@ -57,6 +57,9 @@ or
 
 = 
 
+= 3.0.2 - 15/08/2014 =
+*  Minor address updating issues and bugs!
+
 = 3.0.1 - 09/08/2014 =
 *  Minor uploading bug fixes
 

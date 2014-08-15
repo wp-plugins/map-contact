@@ -56,9 +56,19 @@ echo '<link rel="stylesheet" type="text/css" href="'.plugins_url( 'includes/styl
                 $id = explode("_",$key)[0];
                 $row = $wpdb->get_var("SELECT $element FROM ".$wpdb->prefix."map_settings WHERE id='".$id."'");
 
-                if (@mysql_fetch_array($result) !== false && !empty($id) && !empty($element) && !empty($value))
+                if (@mysql_fetch_array($result) !== false && !empty($id) && !empty($element))
                 {
-                    $wpdb->query("UPDATE ".$wpdb->prefix."map_addresses SET $element='".$value."' WHERE id='".$id."'");
+                    if ($element=="image")
+                    {
+                        if (!empty($value))
+                        {
+                            $wpdb->query("UPDATE ".$wpdb->prefix."map_addresses SET $element='".$value."' WHERE id='".$id."'");
+                        }
+                    }
+                    else
+                    {
+                        $wpdb->query("UPDATE ".$wpdb->prefix."map_addresses SET $element='".$value."' WHERE id='".$id."'");
+                    }
                 }
             }
 
@@ -96,7 +106,7 @@ echo '<link rel="stylesheet" type="text/css" href="'.plugins_url( 'includes/styl
             $image = "";
             $address = get_object_vars($address);
 
-            if (!empty($address["image"]) && $imported==false)
+            if ($imported==false)
             {
                 wp_enqueue_script('jquery');
                 wp_enqueue_script('media-upload');
