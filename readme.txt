@@ -57,6 +57,9 @@ or
 
 = 
 
+= 3.0.3 - 15/08/2014 =
+*  Minor map displaying issues fixed!
+
 = 3.0.2 - 15/08/2014 =
 *  Minor address updating issues and bugs!
 

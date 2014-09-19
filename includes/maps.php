@@ -21,9 +21,12 @@ class MapsAPI
         "overviewMapControl" => true,
         "rotateControl" => true
     );
+    private $directions = array();
 
     public function __construct($mapElement,$apiKey = "",$markerURL = "",$markerWidth = "",$markerHeight = "")
     {
+        ini_set("allow_url_fopen",true);
+
         $this->mapElement = $mapElement;
 
         if (!empty($markerURL) && !empty($markerWidth) && !empty($markerHeight))
@@ -56,12 +59,28 @@ class MapsAPI
         }
     }
 
+    public function addMapDirections($startLat,$startLng,$endLat,$endLng,$travelMode)
+    {
+        if (!empty($startLat) && !empty($startLng) && !empty($endLat) && !empty($endLng))
+        {
+            $this->directions = array();
+
+            $this->directions["start"]["lat"] = $startLat;
+            $this->directions["start"]["lng"] = $startLng;
+
+            $this->directions["end"]["lat"] = $endLat;
+            $this->directions["end"]["lng"] = $endLng;
+            $this->directions["travelMode"] = $travelMode;
+        }
+    }
+
     public function convertLongLat($long,$lat)
     {
         $array = array();
+        $api = "";
         if (!empty($this->apiKey)) { $api = "key=".$this->apiKey."&"; }
 
-        $ret = $this->curlRequest("https://maps.googleapis.com/maps/api/geocode/json?".@$api."latlng=".trim($long).",".trim($lat));
+        $ret = $this->urlRequest("https://maps.googleapis.com/maps/api/geocode/json?".@$api."latlng=".trim($long).",".trim($lat));
         if (!is_array(@get_object_vars(json_decode($ret)))) {return $ret; }
 
         $components = @get_object_vars(@get_object_vars(json_decode($ret))["results"][0])["address_components"];
@@ -78,9 +97,11 @@ class MapsAPI
 
     public function convertAddress($address)
     {
+        $api = "";
         if (!empty($this->apiKey)) { $api = "key=".$this->apiKey."&"; }
 
-        $ret = $this->curlRequest("https://maps.googleapis.com/maps/api/geocode/json?".@$api."address=".urlencode($address));
+        $ret = $this->urlRequest("https://maps.googleapis.com/maps/api/geocode/json?".@$api."address=".urlencode($address));
+
         if (!is_array(@get_object_vars(json_decode($ret)))) {return $ret; }
 
         $components = @get_object_vars(@get_object_vars(json_decode($ret))["results"][0])["geometry"];
@@ -107,7 +128,7 @@ class MapsAPI
     public function generateMap()
     {
         $optionsCode = "";
-
+        $api = "";
         if (!empty($this->apiKey)) { $api = "key=".$this->apiKey."&"; }
 
         $map = '<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?'.@$api.'sensor=false"></script>';
@@ -149,7 +170,7 @@ class MapsAPI
                     $markersCode .= 'google.maps.event.addListener(marker_'.$id.', \'click\', function() { '.$marker["onclick"].' });';
                 }
                 else{
-                    $markersCode .= 'var infowindow_'.$id.' = new google.maps.InfoWindow({ content:"'."<div style='overflow-y:hidden; padding-left:15px; padding-top:6px; padding-right:15px;'>".$marker["infoWindow"]."</div>".'" });
+                    $markersCode .= 'var infowindow_'.$id.' = new google.maps.InfoWindow({ content:"'."<div style='overflow-y:hidden; padding-left:15px; padding-right:15px;'>".$marker["infoWindow"]."</div>".'" });
                     google.maps.event.addListener(marker_'.$id.', \'click\', function() { infowindow_'.$id.'.open(map,marker_'.$id.'); }); ';
                 }
             }
@@ -177,18 +198,34 @@ class MapsAPI
             $y = $this->mapCenter["y"];
         }
 
+        $directionsInit = "";
+        $calcRoute = "";
+        $srt = "";
+        if (!empty($this->directions))
+        {
+            $srt = "var directionsDisplay; var directionsService = new google.maps.DirectionsService();";
+            $directionsInit = "directionsDisplay = new google.maps.DirectionsRenderer();directionsDisplay.setMap(map);";
+
+            $calcRoute = "
+            function calcRoute() {
+            var request = { origin:new google.maps.LatLng(".$this->directions["start"]["lat"].",".$this->directions["start"]["lng"]."), destination:new google.maps.LatLng(".$this->directions["end"]["lat"].",".$this->directions["end"]["lng"]."), travelMode: ".$this->directions["travelMode"]." };
+            directionsService.route(request, function(response, status) { if (status == google.maps.DirectionsStatus.OK) { directionsDisplay.setDirections(response); } }); }
+            calcRoute();";
+        }
+
         $map .= '
         <script>
+            '.$srt.'
 	        function initialise() {
 		        var mapOptions = {
 		            center: new google.maps.LatLng('.$x.','.$y.'),
 		            '.rtrim($optionsCode, ",").'
 		        }
 		        var map = new google.maps.Map(document.getElementById(\''.$this->mapElement.'\'), mapOptions);
-
+                '.$directionsInit.'
                 '.$markersCode.'
             }
-
+            '.$calcRoute.'
             google.maps.event.addDomListener(window, \'load\', initialise);
         </script>
         ';
@@ -201,16 +238,9 @@ class MapsAPI
         return $map;
     }
 
-    public function curlRequest($URL)
+    public function urlRequest($URL)
     {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $URL);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36");
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        $output = curl_exec($ch);
-        curl_close($ch);
+        $output = file_get_contents($URL);
 
         if (!is_array($output)) { $ret = @get_object_vars(json_decode($output));}
 
