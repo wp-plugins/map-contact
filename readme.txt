@@ -3,7 +3,7 @@
 Contributors: ryan_xantoo
 Tags: Contact Us, Contact Us Page, WordPress Contact Us, Contact Forms, Map Contact, Contact Form With Map, Map
 Requires at least: 3.0
-Tested up to: 4.1
+Tested up to: 4.1.1
 Stable tag: 2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -55,7 +55,7 @@ or
 
 == Changelog ==
 
-= 
+
 
 = 3.0.3 - 15/08/2014 =
 *  Minor map displaying issues fixed!
